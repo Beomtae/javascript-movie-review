@@ -49,6 +49,7 @@ button.primary {
 #wrap {
   width: 100%;
   background-color: var(--color-bluegray-100);
+  position: relative;
 }
 #wrap h2 {
   font-size: 1.4rem;
@@ -585,6 +586,9 @@ p.rate > span {
 .block {
   display: block;
 }
+section {
+  margin-top: 150px;
+}
 @media (max-width: 768px) {
   /* 태블릿 */
   .thumbnail-list {
@@ -592,6 +596,7 @@ p.rate > span {
   }
   section h2 {
     width: 100%;
+    text-align: center;
   }
 }
 @media (max-width: 480px) {
@@ -756,6 +761,10 @@ footer.footer p:not(:last-child) {
   display: block;
 }
 
+section {
+  margin-top: 150px;
+}
+
 @media (max-width: 768px) {
   /* 태블릿 */
   .thumbnail-list {
@@ -763,6 +772,7 @@ footer.footer p:not(:last-child) {
   }
   section h2 {
     width: 100%;
+    text-align: center;
   }
 }
 

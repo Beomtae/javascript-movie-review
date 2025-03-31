@@ -495,7 +495,6 @@ class Modal {
     starImages.forEach((star, index) => {
       star.addEventListener("click", () => {
         const score = (index + 1) * 2;
-        console.log(score);
         starImages.forEach((s, i) => {
           s.src = i < index + 1 ? "./images/star_filled.png" : "./images/star_empty.png";
         });
@@ -602,7 +601,6 @@ class App {
     app2.innerHTML = "";
     const $wrap = document.createElement("div");
     $wrap.id = "wrap";
-    $wrap.style.position = "relative";
     const $thumbnail = new Thumbnail(
       !isLoading && movies && movies.length > 0 ? movies[0] : null,
       isLoading
@@ -621,7 +619,9 @@ class App {
       this.handleMovieClick
     ).render();
     app2.appendChild($wrap);
-    $wrap.appendChild($thumbnail);
+    if ($thumbnail) {
+      $wrap.appendChild($thumbnail);
+    }
     $wrap.appendChild($header);
     $wrap.appendChild($container);
     $container.appendChild($main);
