@@ -87,7 +87,7 @@ class TitleSearchBar {
   }
 }
 class Thumbnail {
-  constructor(movie, isLoading) {
+  constructor({ movie, isLoading }) {
     this.movie = movie;
     this.isLoading = isLoading;
   }
@@ -147,6 +147,7 @@ const STAR_COMMENT = {
   8: "재미있어요",
   10: "명작이에요"
 };
+const MOVIE_COUNT = 20;
 const IMG_PATH = `https://image.tmdb.org/t/p`;
 async function getFetchData(url) {
   const response = await fetch(url, {
@@ -248,7 +249,7 @@ class MovieListSection {
     const $ul = document.createElement("ul");
     $ul.classList.add("thumbnail-list");
     if (this.isLoading) {
-      for (let i = 0; i < 20; i++) {
+      for (let i = 0; i < MOVIE_COUNT; i++) {
         const $item = new MovieItem(null, true, this.handleMovieClick).render();
         $ul.appendChild($item);
       }
@@ -262,7 +263,7 @@ class MovieListSection {
       return $section;
     }
     const totalMovie = this.movies.length;
-    const startIndex = Math.max(0, totalMovie - 20);
+    const startIndex = Math.max(0, totalMovie - MOVIE_COUNT);
     if (totalMovie === 0) {
       const $div = new EmptyView("검색 결과가 없습니다.").render();
       $section.appendChild($title);
@@ -270,7 +271,7 @@ class MovieListSection {
       return $section;
     }
     $section.appendChild($title);
-    if (totalMovie <= 20) {
+    if (totalMovie <= MOVIE_COUNT) {
       this.renderMovieItemByArray(this.movies, $ul, false);
       $section.appendChild($ul);
       return $section;
@@ -286,7 +287,7 @@ class MovieListSection {
   }
   renderSkeleton($ul) {
     const skeletonElements = [];
-    for (let i = 0; i < 20; i++) {
+    for (let i = 0; i < MOVIE_COUNT; i++) {
       const skeleton = document.createElement("li");
       skeleton.classList.add("skeleton-box");
       skeletonElements.push(skeleton);
@@ -419,6 +420,8 @@ class Modal {
     this.movieDetail = movieDetail;
   }
   render() {
+    const releaseDate = this.movieDetail.release_date.split("-")[0];
+    const genres = this.movieDetail.genres.map((data) => data.name);
     this.$div = document.createElement("div");
     this.$div.innerHTML = /*html*/
     `
@@ -436,10 +439,10 @@ class Modal {
           <div class="modal-description">
             <h2>${this.movieDetail.title}</h2>
             <p class="category">
-              ${this.movieDetail.release_date.split("-")[0]} · ${this.movieDetail.genres.map((data) => data.name)}
+              ${releaseDate} · ${genres}
             </p>
             <div class="average_star_container">
-            <p class=>평균 </p>
+            <p>평균 </p>
             <p class="rate">
               <img src="./images/star_filled.png" class="star" /><span
                 >${parseFloat(this.movieDetail.vote_average).toFixed(1)}</span
@@ -510,7 +513,13 @@ class Modal {
   }
   addCloseModal() {
     const closeButton = this.$div.querySelector("#closeModal");
+    const background = this.$div.querySelector("#modalBackground");
     closeButton.addEventListener("click", () => this.closeModal());
+    background.addEventListener("click", (e) => {
+      if (e.target === background) {
+        this.closeModal();
+      }
+    });
     document.addEventListener("keydown", () => this.handleKeyDown(event));
   }
   handleKeyDown(e) {
@@ -521,6 +530,16 @@ class Modal {
   closeModal() {
     this.$div.remove();
   }
+}
+function throttle(callback, delay) {
+  let timer;
+  return (...args) => {
+    if (timer) return;
+    timer = setTimeout(() => {
+      callback(...args);
+      timer = null;
+    }, delay);
+  };
 }
 class App {
   constructor() {
@@ -601,10 +620,10 @@ class App {
     app2.innerHTML = "";
     const $wrap = document.createElement("div");
     $wrap.id = "wrap";
-    const $thumbnail = new Thumbnail(
-      !isLoading && movies && movies.length > 0 ? movies[0] : null,
+    const $thumbnail = new Thumbnail({
+      movie: !isLoading && movies && movies.length > 0 ? movies[0] : null,
       isLoading
-    ).render();
+    }).render();
     const $header = new TitleSearchBar(
       this.onSubmit,
       this.onLogoClick
@@ -612,12 +631,13 @@ class App {
     const $container = document.createElement("div");
     $container.classList.add("container");
     const $main = document.createElement("main");
-    const $movieListSection = new MovieListSection(
+    __privateSet(this, _movieListSection, new MovieListSection(
       this.getKeywordFromURL(),
       movies,
       isLoading,
       this.handleMovieClick
-    ).render();
+    ));
+    const $movieListSection = __privateGet(this, _movieListSection).render();
     app2.appendChild($wrap);
     if ($thumbnail) {
       $wrap.appendChild($thumbnail);
@@ -626,23 +646,26 @@ class App {
     $wrap.appendChild($container);
     $container.appendChild($main);
     $main.appendChild($movieListSection);
-    window.addEventListener("scroll", () => {
-      if (!__privateGet(this, _uiManager).getHasMore() || __privateGet(this, _uiManager).getLoading()) {
-        return;
-      }
-      const scrollPosition = window.scrollY || window.pageYOffset;
-      const windowHeight = window.innerHeight;
-      const documentHeight = Math.max(
-        document.body.scrollHeight,
-        document.body.offsetHeight,
-        document.documentElement.clientHeight,
-        document.documentElement.scrollHeight,
-        document.documentElement.offsetHeight
-      );
-      if (scrollPosition + windowHeight >= documentHeight - 100) {
-        this.handleScroll();
-      }
-    });
+    window.addEventListener(
+      "scroll",
+      throttle(() => {
+        if (!__privateGet(this, _uiManager).getHasMore() || __privateGet(this, _uiManager).getLoading()) {
+          return;
+        }
+        const scrollPosition = window.scrollY || window.pageYOffset;
+        const windowHeight = window.innerHeight;
+        const documentHeight = Math.max(
+          document.body.scrollHeight,
+          document.body.offsetHeight,
+          document.documentElement.clientHeight,
+          document.documentElement.scrollHeight,
+          document.documentElement.offsetHeight
+        );
+        if (scrollPosition + windowHeight >= documentHeight - 100) {
+          this.handleScroll();
+        }
+      }, 300)
+    );
     const $footer = new Footer().render();
     app2.appendChild($footer);
   }
