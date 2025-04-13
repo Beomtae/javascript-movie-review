@@ -1,6 +1,6 @@
 function Footer() {
   return (
-    <footer class="footer">
+    <footer className="footer">
       <p>&copy; 우아한테크코스 All Rights Reserved.</p>
       <p>
         <img src="./images/woowacourse_logo.png" width="180" />

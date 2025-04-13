@@ -76,6 +76,11 @@ button.primary {
   height: 100%;
   z-index: 1;
 }
+.overlay img {
+  width: 100%;
+  height: 100%;
+  opacity: 70%;
+}
 
 .top-rated-container {
   user-select: none;
@@ -96,7 +101,40 @@ button.primary {
 h1.logo {
   font-size: 2rem;
 }
+.logo-container {
+  display: flex;
+}
 
+.search-bar {
+  width: 25rem;
+  height: 36px;
+  border-radius: 32px;
+  border: 2px solid white;
+  padding: 6px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: absolute;
+  left: 30%;
+}
+
+.search-button {
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.search-input {
+  width: 90%;
+  background-color: transparent;
+  border: none;
+  color: white;
+}
+
+.search-input::placeholder {
+  color: white;
+}
 .rate {
   display: flex;
   align-items: baseline;
